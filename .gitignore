@@ -21,8 +21,8 @@ public/css/main.css
 # Coverage reports
 coverage
 
-# API keys and secrets
-.env
+# API keys and secrets (Ne jamais push le .env normelement, ceci est pour seulement test technique APPARTOO)
+# .env
 
 # Dependency directory
 node_modules
