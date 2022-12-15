@@ -4,10 +4,9 @@ import fs from 'fs';
 import { Application } from 'express';
 import socket from '../middlewares/socket';
 import * as socketio from "socket.io"
-import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import * as http from 'http'
 
-const mongooseConnect = async (app: Application, httpServer: http.Server, io: socketio.Server<DefaultEventsMap, DefaultEventsMap>) => {
+const mongooseConnect = async (app: Application, httpServer: http.Server, io: socketio.Server) => {
     return new Promise((resolve, reject) => {
         //const uri: string = String(process.env.ENV).trim() === "PROD" ? String(process.env.MONGO_URL).trim() : String(process.env.MONGO_URL_LOCAL).trim();
         const uri: string = String(process.env.MONGO_URL).trim();
