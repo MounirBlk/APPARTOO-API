@@ -7,7 +7,7 @@ import mongooseConnect from './src/db';
 import fs from 'fs';
 import rateLimit from 'express-rate-limit';
 import * as http from 'http';
-import * as socketio from "socket.io";
+import socketio from "socket.io";
 import { CronJob } from "cron";
 //import helmet from 'helmet';
 import morgan from 'morgan'
@@ -20,7 +20,7 @@ const app: Application = express();
 app.use(morgan('combined', { stream: logger.stream }));// Logger
 
 const httpServer: http.Server = http.createServer(app);
-const io = new socketio.Server(httpServer, { cors: { origin: '*' }, serveClient: false });
+const io = new socketio.Server(httpServer, { cors: { origin: '*' }, serveClient: false }); // TODO Resolve socket server
 app.set('socketIO', io);
 
 // parse application/x-www-form-urlencoded
