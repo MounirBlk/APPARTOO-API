@@ -14,8 +14,7 @@ import { CallbackError } from 'mongoose';
  */
 export const register = async (req: Request, res: Response): Promise<void> => {
     const data = req.body;
-    if (isEmptyNullUndefinedObject(data) || !exist(data.email) || !exist(data.password) || !exist(data.firstname) || !exist(data.lastname) ||
-        !exist(data.dateNaissance) || !exist(data.civilite) || !exist(data.role)) {
+    if (isEmptyNullUndefinedObject(data) || !exist(data.email) || !exist(data.password) || !exist(data.name) || !exist(data.civilite) || !exist(data.role)) {
         return dataResponse(res, 400, { error: true, message: 'Une ou plusieurs données obligatoire sont manquantes' })
     } else {
         if (!emailFormat(data.email) || !passwordFormat(data.password) || !textFormat(data.name) || !textFormat(data.civilite) || !textFormat(data.role) ||
@@ -76,7 +75,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
                         pangolin.updateAt = new Date();
                         pangolin.lastLogin = new Date();
                         await pangolin.save();
-                        return dataResponse(res, 200, { error: false, message: "Le pangolin a été authentifié avec succès", token: pangolin.token, pangolin: deleteMapper(pangolin) })
+                        return dataResponse(res, 200, { error: false, message: "Le pangolin a été authentifié avec succès", token: pangolin.token })
                     }
                 } else {// Password incorrect
                     if (<number>pangolin.attempt >= 5 && ((<any>new Date() - <any>pangolin.updateAt) / 1000 / 60) <= 2) {
@@ -161,7 +160,9 @@ export const getOnePangolin = async (req: Request, res: Response): Promise<void>
             if (!isObjectIdValid(id) || await PangolinModel.countDocuments({ _id: id }) === 0) {
                 return dataResponse(res, 409, { error: true, message: "L'id n'est pas valide !" })
             } else {
-                PangolinModel.findOne({ _id: id }).populate('ami').exec((err: CallbackError, results: PangolinInterface | null) => {
+                PangolinModel.findOne({ _id: id }).populate({
+                    path: 'ami',
+                }).exec((err: CallbackError, results: PangolinInterface | null) => {
                     if (err) {
                         return dataResponse(res, 500, { error: true, message: "Erreur dans la requête !" });
                     } else if (results === undefined || results === null) {// Si le resultat n'existe pas
@@ -203,7 +204,9 @@ export const getAllPangolins = async (req: Request, res: Response): Promise<void
         if (payload === null || !isDataOk(payload)) {
             return dataResponse(res, 401, { error: true, message: 'Votre token n\'est pas correct' })
         } else {
-            PangolinModel.find({}).populate('ami').exec((err: CallbackError, results: PangolinInterface[]) => {
+            PangolinModel.find({}).populate({
+                path: 'ami',
+            }).exec((err: CallbackError, results: PangolinInterface[]) => {
                 if (err) {
                     return dataResponse(res, 500, { error: true, message: "Erreur dans la requête !" });
                 } else if (results === undefined || results === null) {// Si le resultat n'existe pas
@@ -247,7 +250,9 @@ export const getOwnPangolin = async (req: Request, res: Response): Promise<void>
         if (payload === null || !isDataOk(payload)) {
             return dataResponse(res, 401, { error: true, message: 'Votre token n\'est pas correct' })
         } else {
-            PangolinModel.findOne({ _id: payload.id }).populate('idEntreprise').exec((err: CallbackError, results: PangolinInterface | null) => {
+            PangolinModel.findOne({ _id: payload.id }).populate({
+                path: 'ami',
+            }).exec((err: CallbackError, results: PangolinInterface | null) => {
                 if (err) {
                     return dataResponse(res, 500, { error: true, message: "Erreur dans la requête !" });
                 } else if (results === undefined || results === null) {// Si le resultat n'existe pas
@@ -309,8 +314,6 @@ export const updatePangolin = async (req: Request, res: Response): Promise<void>
                             let ami = null;
                             if (exist(data.ami)) {
                                 ami = isObjectIdValid(data.ami) && await PangolinModel.countDocuments({ _id: data.ami }) !== 0 ? data.ami : pangolin.ami
-                            } else {
-                                ami = pangolin.ami
                             }
                             let toUpdate: any = {
                                 name: exist(data.name) ? !textFormat(data.name) ? (isOnError = true) : firstLetterMaj(data.name) : pangolin.name,
