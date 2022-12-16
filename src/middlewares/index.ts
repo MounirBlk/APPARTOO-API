@@ -1,5 +1,5 @@
 import { Application, Request, Response, NextFunction, Errback } from 'express';
-import UserModel from '../models/PangolinModel';
+import PangolinModel from '../models/PangolinModel';
 import jwt from 'jsonwebtoken';
 import { isValidObjectId, Types } from 'mongoose'
 import v from 'validator';
@@ -227,7 +227,7 @@ const getJwtPayload = async (tokenHeader: string | undefined): Promise<any | nul
         try {
             if (tokenHeader && tokenHeader !== undefined && isDataOk(tokenHeader)) {
                 const token = tokenHeader.replace(/^bearer/i, "").trim();
-                if (!v.isJWT(token) || await UserModel.countDocuments({ token: token }) === 0) { // Un utilisateur connecté par compte
+                if (!v.isJWT(token) || await PangolinModel.countDocuments({ token: token }) === 0) { // Un utilisateur connecté par compte
                     resolve(null);// TODO: to perform with reject()
                 } else {
                     const jwtObject = jwt.verify(token, String(process.env.JWT_TOKEN_SECRET));
