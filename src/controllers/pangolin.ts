@@ -33,9 +33,12 @@ export const register = async (req: Request, res: Response): Promise<void> => {
                     role: data.role.trim()
                 };
                 const pangolinToSave: PangolinInterface = new PangolinModel(toInsert);
-                pangolinToSave.save().then((pangolin: PangolinInterface) => {
+                pangolinToSave.save().then(async (pangolin: PangolinInterface) => {
+                    const responsePangolin = await PangolinModel.findById(pangolin.get('_id')).populate({
+                        path: 'ami',
+                    });
                     if (isDataOk(pangolin)) {
-                        return dataResponse(res, 201, { error: false, message: "Le pangolin a bien été créé avec succès" });
+                        return dataResponse(res, 201, { error: false, message: "Le pangolin a bien été créé avec succès", pangolin: deleteMapper(responsePangolin) });
                     }
                 }).catch(() => {
                     return dataResponse(res, 500, { error: true, message: "Erreur dans la requête !" });
